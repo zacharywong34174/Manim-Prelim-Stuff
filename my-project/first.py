@@ -5,6 +5,20 @@ manim -qm -p file_name.py class_name (IF JUST IMAGE)
 manim -pqh file_name.py class_name (IF ANIMATION)
 '''
 
+'''
+Notes:
+Change mobjects: transform...
+Emphasize mobjects: indicate, circumscribe...
+Draw border then fill 
+
+.next_to()
+.align_to()
+
+.arrange()
+.arrange_in_grid()
+'''
+
+
 class TestScene(Scene):
     def construct(self):
         text_test = Tex(r'What is slope?')
@@ -36,7 +50,7 @@ class TestScene(Scene):
         graph = ax.plot(lambda x: x**2, x_range=[-2.35, 2.35], color=ORANGE)
         self.play(Create(graph), run_time=2)
         self.play(FadeOut(lead))
-        self.play(ref_func_1.animate.shift(UP*0.5).set_color(YELLOW_C), run_time=1)
+        self.play(ref_func_1.animate.shift(UP*0.5).set_color(ORANGE), run_time=1)
         self.wait(2)
 
         text = Tex(r"Let's pick some random points", font_size=72).shift(DOWN*2.5)
@@ -45,13 +59,19 @@ class TestScene(Scene):
         self.wait(1)
         self.play(FadeOut(VGroup(text, box)), run_time = 0.3)
 
-        text2 = Tex(r"Let's have one pair of dots at $(-2, 4)$ and $(0, 0)$.").shift(DOWN*2.5)
+        text2 = Tex(r"Let's have one pair of dots at $(-2, 4)$ and $(0, 0)$.", substrings_to_isolate=["$(-2, 4)$", "$(0, 0)$"]).shift(DOWN*2.5)
+        text2.set_color_by_tex("$(-2, 4)$", GREEN)
+        text2.set_color_by_tex("$(0, 0)$", GREEN)
         green_dot = Dot(color=GREEN)
         another_green_dot = Dot(color=GREEN)
-        text3 = Tex(r"Let's have another pair at $(-1, 1)$ and $(1, 1)$.").shift(DOWN*2.5)
+        text3 = Tex(r"Let's have another pair at $(-1, 1)$ and $(1, 1)$.", substrings_to_isolate=["$(-1, 1)$", "$(1, 1)$"]).shift(DOWN*2.5)
+        text3.set_color_by_tex("$(-1, 1)$", YELLOW)
+        text3.set_color_by_tex("$(1, 1)$", YELLOW)
         yellow_dot = Dot(color=YELLOW)
         another_yellow_dot = Dot(color=YELLOW)
-        text4 = Tex(r"And finally another one at $(0, 0)$ and $(2, 4)$.").shift(DOWN*2.5)
+        text4 = Tex(r"And finally another one at $(0, 0)$ and $(2, 4)$.", substrings_to_isolate=["$(0, 0)$", "$(2, 4)$"]).shift(DOWN*2.5)
+        text4.set_color_by_tex("$(0, 0)$", RED)
+        text4.set_color_by_tex("$(2, 4)$", RED)
         red_dot = Dot(color=RED)
         another_red_dot = Dot(color=RED)
 
@@ -60,12 +80,15 @@ class TestScene(Scene):
         colors = ['GREEN', 'YELLOW', 'RED']
         color_cycle = itertools.cycle(colors)
 
+        list_of_lines = []
+
         def rinse_and_repeat(text, dot1, dot2, x1, y1, x2, y2):
             box = BackgroundRectangle(text, color=None, fill_opacity=0.2)
             self.play(Create(VGroup(box, text)))
             self.play(dot1.animate.move_to(ax.coords_to_point(x1, y1)))
             self.play(dot2.animate.move_to(ax.coords_to_point(x2, y2)))
             line = Line(ax.coords_to_point(x1, y1), ax.coords_to_point(x2, y2))
+            list_of_lines.append(line)
             self.play(Create(line))
             self.play(line.animate.set_color(next(color_cycle)), run_time = 0.3)
             self.wait(2)
@@ -74,6 +97,57 @@ class TestScene(Scene):
         rinse_and_repeat(text2, green_dot, another_green_dot, -2, 4, 0, 0)
         rinse_and_repeat(text3, yellow_dot, another_yellow_dot, -1, 1, 1, 1)
         rinse_and_repeat(text4, red_dot, another_red_dot, 0, 0, 2, 4)
+
+        self.wait(2)
+
+        transformation_group_1 = VGroup(ax, graph, ref_func_1, yellow_dot, another_yellow_dot, green_dot, another_green_dot, red_dot, another_red_dot)
+        transformation_group_2 = VGroup(*list_of_lines)
+        self.play(FadeOut(transformation_group_1), transformation_group_2.animate.arrange(RIGHT, buff=1), run_time=2)
+
+        self.wait(2)
+
+        text = Tex(r"What do you notice about the lines?").to_edge(UP).shift(DOWN)
+        self.play(FadeIn(text), run_time=3)
+
+        self.wait(1)
+
+        text1 = Tex(r"Let's put \emph{balls} in the middle of each of these lines.", substrings_to_isolate=["balls"]).to_edge(UP).shift(DOWN)
+        text1.set_color_by_tex("balls", YELLOW)
+        gigachad = ImageMobject("media\\images\\first\\gigachad.jpg").scale(0.4)
+        self.play(FadeTransform(text, text1, run_time=2), transformation_group_2.animate.arrange(RIGHT, buff=1.2))
+        self.play(FadeIn(gigachad), run_time=0.3)
+        self.play(FadeOut(gigachad), run_time=0.3)
+
+        self.wait(1)
+
+        line_centers = [line.get_center() for line in list_of_lines]
+
+        positions = [UP*0.1414+RIGHT*0.1414, UP*0.2, UP*0.1414+LEFT*0.1414]
+        positions_cycle = itertools.cycle(positions)
+
+        list_dots = []
+
+        for line_center in line_centers:
+            dot = Dot(line_center, color=WHITE).shift(next(positions_cycle))
+            list_dots.append(dot)
+        self.play(Create(VGroup(*list_dots)), run_time = 0.5)
+
+        self.wait(4.3)
+
+        text2 = Tex(r"Where will the balls roll?").to_edge(UP).shift(DOWN)
+
+        '''
+        Question should be: What happens to the height of the balls as they go to the right? (word in small pieces, though)
+        '''
+
+        text3b = Tex(r"What do you notice about the lines?").to_edge(UP).shift(DOWN)
+        text3a = Tex(r"So the question again:").scale(0.8).next_to(text3b, UP)
+        self.play(FadeTransform(text1, text2, run_time=2))
+        self.wait(3)
+        self.play(FadeTransform(text2, text3a, run_time=2), Uncreate(VGroup(*list_dots), run_time=1))
+        self.play(FadeIn(text3b, run_time=2))
+
+        self.wait(4)
 
         '''
         Now let's temporarily take away the coordinate plane.
