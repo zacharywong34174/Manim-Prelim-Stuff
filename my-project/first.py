@@ -41,6 +41,20 @@ Scene updaters
 Suspend updating, resume updating
 
 ValueTracker
+
+
+Interactivity
+
+manim.opengl 
+set_euler_angles with camera mobject; theta and phi 
+
+surface 
+surface mesh 
+self.camera.light_source
+
+OpenGLTexturedSurface
+
+self.interactive_embed()
 '''
 
 

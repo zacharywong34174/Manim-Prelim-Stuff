@@ -1,5 +1,2 @@
 # This file is used internally by FFMPEG.
-file 'file:C:/Users/Zacha/OneDrive/Documents/Manim Prelim Stuff/media/videos/main/1080p60/partial_movie_files/Test/3529212410_2310868186_3518946344.mp4'
-file 'file:C:/Users/Zacha/OneDrive/Documents/Manim Prelim Stuff/media/videos/main/1080p60/partial_movie_files/Test/3040924799_2408024828_1670881345.mp4'
-file 'file:C:/Users/Zacha/OneDrive/Documents/Manim Prelim Stuff/media/videos/main/1080p60/partial_movie_files/Test/3040924799_113612781_3117992445.mp4'
-file 'file:C:/Users/Zacha/OneDrive/Documents/Manim Prelim Stuff/media/videos/main/1080p60/partial_movie_files/Test/3040924799_2408024828_2761882695.mp4'
+file 'file:C:/Users/Zacha/Manim-Prelim-Stuff-1/media/videos/main/1080p60/partial_movie_files/Test/3977891868_3669861728_2358810818.mp4'
