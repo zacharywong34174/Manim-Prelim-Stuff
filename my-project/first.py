@@ -93,7 +93,7 @@ class TestScene(Scene):
         self.wait(2)
 
         text = Tex(r"Let's pick some random points", font_size=72).shift(DOWN*2.5)
-        box = BackgroundRectangle(text, color=None, fill_opacity=0.2)
+        box = BackgroundRectangle(text, color=None, fill_opacity=0.5)
         self.play(FadeIn(VGroup(text, box)), run_time = 2)
         self.wait(1)
         self.play(FadeOut(VGroup(text, box)), run_time = 0.3)
@@ -140,7 +140,9 @@ class TestScene(Scene):
         self.wait(2)
 
         transformation_group_1 = VGroup(ax, graph, ref_func_1, yellow_dot, another_yellow_dot, green_dot, another_green_dot, red_dot, another_red_dot)
+        transformation_group_1.save_state()
         transformation_group_2 = VGroup(*list_of_lines)
+        transformation_group_2.save_state()
         self.play(FadeOut(transformation_group_1), transformation_group_2.animate.arrange(RIGHT, buff=1), run_time=2)
 
         self.wait(2)
@@ -243,5 +245,106 @@ class TestScene(Scene):
             stick_figure_copy2.animate.move_to(list_of_lines[1].point_from_proportion(1)).shift(UP*0.7+LEFT*0.28)
         )
 
-        self.wait(5)
+        self.play(AnimationGroup(*[FadeOut(mob) for mob in VGroup(stick_figure, stick_figure_copy2, stick_figure_copy1)], lag_ratio=0.5, run_time=2))
+        text5a = Tex(r"Answer: Person A is moving down, person B is staying level, and person C is moving up.").scale(0.75).to_edge(UP).shift(DOWN)
+        self.play(FadeTransform(VGroup(text4a, text4b), text5a))
+
+        self.wait(2)
+        self.play(Restore(transformation_group_1), Restore(transformation_group_2), FadeOut(text5a))
+        self.wait(2)
+
+        text6a = Tex(r"So the green line has a \textbf{negative} slope (person goes down),").scale(0.75).to_edge(DOWN).shift(UP).set_color(GREEN)
+        text6b = Tex(r"the yellow line has a \textbf{zero} slope (person's level doesn't change),").scale(0.75).to_edge(DOWN).shift(UP).set_color(YELLOW)
+        text6c = Tex(r"and the red line has a \textbf{positive} slope (person goes up).").scale(0.75).to_edge(DOWN).shift(UP).set_color(RED)
+
+        self.play(Create(VGroup(box, text6a)), run_time = 3)
+        self.wait()
+        self.play(Transform(VGroup(box, text6a), VGroup(box, text6b)), run_time = 3)
+        self.wait()
+        self.play(Transform(VGroup(box, text6a), VGroup(box, text6c)), run_time = 3)
+        self.wait()
+        self.play(FadeOut(VGroup(box, text6a)), run_time = 0.5)
+        self.wait(2)
+
+        text7a = Tex(r"But how do we \textit{numerically} measure\\ how \textbf{positive} or \textbf{negative} the slope is?").scale(0.75).to_edge(DOWN).shift(UP)
+        self.play(Create(text7a), run_time = 3)
+        self.play(FadeOut(transformation_group_1), transformation_group_2.animate.arrange(RIGHT, buff=1), FadeOut(text7a))
+        self.wait()
+        self.play(FadeOut(VGroup(list_of_lines[1], list_of_lines[2])))
+        self.play(list_of_lines[0].animate.move_to([0,0,0]))
+        self.wait(2)
+
+        line0_copy1 = list_of_lines[0].copy()
+        line0_copy2 = list_of_lines[0].copy()
+        self.play(VGroup(list_of_lines[0], line0_copy1, line0_copy2).animate.scale(0.7))
+        self.play(VGroup(list_of_lines[0], line0_copy1, line0_copy2).animate.arrange(RIGHT, buff=1.5).shift(DOWN*1.5), run_time = 2.5)
+        self.play(Rotate(list_of_lines[0], PI/8), Rotate(line0_copy2, -PI/8))
+
+        text8 = Tex(r"What are the signs of the slopes?").to_edge(UP).shift(DOWN*1.35).scale(0.9)
+        text8a = Tex(r"\underline{Negative}").next_to(list_of_lines[0], UP).scale(0.5)
+        text8b = text8a.copy().next_to(line0_copy1, UP)
+        text8c = text8a.copy().next_to(line0_copy2, UP)
+        self.play(Create(text8))
+        self.wait(3)
+        self.play(AnimationGroup(Create(text8a), Create(text8b), Create(text8c)), lag_ratio=1)
+        self.play(AnimationGroup(FadeOut(text8a), FadeOut(text8b), FadeOut(text8c)), lag_ratio=1)
+        self.wait(2)
+
+        text9 = Tex(r"So \textit{how negative} are they?").to_edge(UP).shift(DOWN*1.35).scale(0.9)
+        self.play(Transform(text8, text9), run_time=2.5)
+        self.wait()
+        self.play(Uncreate(text9))
+        self.play(VGroup(list_of_lines[0], line0_copy1, line0_copy2).animate.shift(UP*1.5))
+
+        x_min = list_of_lines[0].get_start()[0]
+        x_max = list_of_lines[0].get_end()[0]
+        y_min = min(list_of_lines[0].get_start()[1], list_of_lines[0].get_end()[1])
+        y_max = max(list_of_lines[0].get_start()[1], list_of_lines[0].get_end()[1])
+        temp_ax = Axes(
+            x_range=[0, x_max-x_min+0.5, 0.25],
+            y_range=[0, y_max-y_min+0.5, 0.25],
+            x_length=x_max - x_min+0.5,
+            y_length=y_max - y_min+0.5,
+            tips=False,
+            axis_config={"include_numbers": True,"font_size": 12}
+        ).move_to(list_of_lines[0], LEFT).shift(LEFT*0.70+DOWN*0.15)#.align_to(list_of_lines[0], DL)
+
+        self.play(Create(temp_ax))
+
+        x_min_1 = line0_copy1.get_start()[0]
+        x_max_1 = line0_copy1.get_end()[0]
+        y_min_1 = min(line0_copy1.get_start()[1], line0_copy1.get_end()[1])
+        y_max_1 = max(line0_copy1.get_start()[1], line0_copy1.get_end()[1])
+        temp_ax_1 = Axes(
+            x_range=[0, x_max_1-x_min_1+0.5, 0.25],
+            y_range=[0, y_max_1-y_min_1+0.5, 0.25],
+            x_length=x_max_1 - x_min_1+0.5,
+            y_length=y_max_1 - y_min_1+0.5,
+            tips=False,
+            axis_config={"include_numbers": True,"font_size": 12}
+        ).move_to(line0_copy1, LEFT).shift(LEFT*0.70+DOWN*0.15)
+        
+        self.play(Create(temp_ax_1))
+
+        x_min_2 = line0_copy2.get_start()[0]
+        x_max_2 = line0_copy2.get_end()[0]
+        y_min_2 = min(line0_copy2.get_start()[1], line0_copy2.get_end()[1])
+        y_max_2 = max(line0_copy2.get_start()[1], line0_copy2.get_end()[1])
+        temp_ax_2 = Axes(
+            x_range=[0, x_max_2-x_min_2+0.5, 0.25],
+            y_range=[0, y_max_2-y_min_2+0.5, 0.25],
+            x_length=x_max_2 - x_min_2+0.5,
+            y_length=y_max_2 - y_min_2+0.5,
+            tips=False,
+            axis_config={"include_numbers": True,"font_size": 12}
+        ).move_to(line0_copy2, LEFT).shift(LEFT*0.70+DOWN*0.15)
+
+        self.play(Create(temp_ax_2))
+
+        self.wait(2)
+
+        '''
+        Do formula. Then do the same for the other sloped graphs.
+        What to do if 100 animations max?
+        '''
     
